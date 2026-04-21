@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!-- 임시 페이지 -->
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -393,6 +393,9 @@ em {
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
 <body>
+	<div th:replace="~{fragments/header :: global-header(currentMenu='mypage')}"></div>
+	
+	
   <!-- ══ 드로어 (모바일 사이드바) ══ -->
   <div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
   <div class="drawer" id="drawer">
