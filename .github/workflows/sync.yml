@@ -1,0 +1,21 @@
+name: Sync Fork
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Sync upstream changes
+        run: |
+          git remote add upstream https://github.com/leeseonju12/Team_Project
+          git fetch upstream
+          git merge upstream/main
+          git push origin main
