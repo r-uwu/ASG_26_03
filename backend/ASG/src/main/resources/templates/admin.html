@@ -707,11 +707,11 @@
 </div>
 
 <div class="wrapper">
-    <header>
-        <div class="logo">
-            <div class="logo-mark">S</div>
-            <div class="logo-text">소셜다모아</div>
-        </div>
+<header>
+    <div class="logo">
+        <img th:src="@{/image/logo_asg.png}" style="width:30px; height:auto;" alt="로고 이미지" />
+        <img th:src="@{/image/asg.png}" style="width:160px; height:auto;" alt="로고 이미지" />
+    </div>
         <div class="header-right">
             <div class="header-badge">관리자 페이지</div>
             <button class="logout-btn" onclick="logout()">로그아웃</button>
@@ -757,7 +757,6 @@
             <div>
                 <div class="panel">
                     <div class="panel-header">
-                        <div class="panel-icon">🗂</div>
                         <h2>유형별 필터</h2>
                     </div>
                     <div class="panel-body">
@@ -775,7 +774,6 @@
                 <div class="panel">
                     <div class="panel-header">
                         <div class="panel-header-left">
-                            <div class="panel-icon">📨</div>
                             <h2 id="listTitle">전체 문의</h2>
                         </div>
                     </div>
@@ -807,7 +805,6 @@
         <div class="panel" style="margin-top:18px;">
             <div class="panel-header">
                 <div class="panel-header-left">
-                    <div class="panel-icon">📢</div>
                     <h2>공지사항 관리</h2>
                 </div>
                 <button class="btn-add" onclick="openNoticeModal()">+ 공지 추가</button>
@@ -825,7 +822,6 @@
         <div class="panel" style="margin-top:18px;">
             <div class="panel-header">
                 <div class="panel-header-left">
-                    <div class="panel-icon">❓</div>
                     <h2>FAQ 관리</h2>
                 </div>
                 <button class="btn-add" onclick="openFaqModal()">+ FAQ 추가</button>
@@ -1036,10 +1032,7 @@
     }
 
     function logout() {
-        // ✅ 변경: localStorage -> sessionStorage
-        sessionStorage.removeItem('adminToken');
-        resetAdminState();
-        showLogin();
+        window.location.href = '/landing-page';
     }
 
     function updateCounts() {

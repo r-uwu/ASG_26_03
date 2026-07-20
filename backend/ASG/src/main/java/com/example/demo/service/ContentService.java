@@ -112,11 +112,12 @@ public class ContentService {
 	@Transactional
 	public List<SnsResult> generateAllSnsContent(ContentRequest request) {
 
-		String industry = "카페 / 베이커리, 소셜다모아 카페";
+		String industry = "카페 / 베이커리, store name : 디아즈 카페";
 
 		String prompt = String.format("Role: %s Marketer. Task: Promo post. Lang: Korean.\n"
 				+ "Menu/Item: %s\nPlatforms: %s\nExtra: %s\nKeywords: %s\nTone: %s\nEmoji: %s\nMaxLen: %d chars.\n"
 				+ "Rule: STRICT JSON Array ONLY. NO markdown. "
+				+ "If Platforms is NAVER, ignore MaxLen and write a long text of 1,000 characters or more."
 				+ "Create one JSON object for EACH platform listed in 'Platforms'. "
 				+ "Format: [{ \"platform\": \"<PLATFORM_NAME>\", \"content\": \"...\", \"hashtags\": [\"#tag1\", \"#tag2\"] }]",
 				industry, request.getMenuName(), request.getPlatforms(), request.getExtraInfo(), request.getKeywords(),

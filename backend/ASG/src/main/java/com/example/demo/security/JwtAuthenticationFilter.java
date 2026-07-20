@@ -18,6 +18,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
+import jakarta.servlet.http.Cookie;
+
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -30,29 +32,41 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+    	// 변경 후
+    	String token = null;
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7);
+    	String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+    	if (authHeader != null && authHeader.startsWith("Bearer ")) {
+    	    token = authHeader.substring(7);
+    	} else {
+    	    Cookie[] cookies = request.getCookies();
+    	    if (cookies != null) {
+    	        for (Cookie cookie : cookies) {
+    	            if ("access_token".equals(cookie.getName())) {
+    	                token = cookie.getValue();
+    	                break;
+    	            }
+    	        }
+    	    }
+    	}
 
-            if (jwtTokenProvider.validate(token) && "access".equals(jwtTokenProvider.getTokenType(token))) {
-                Long userId = jwtTokenProvider.getUserId(token);
+    	if (token != null && jwtTokenProvider.validate(token) && "access".equals(jwtTokenProvider.getTokenType(token))) {
+    	    Long userId = jwtTokenProvider.getUserId(token);
 
-                userRepository.findById(userId).ifPresent(user -> {
-                    PrincipalDetails principalDetails = new PrincipalDetails(user);
+    	    userRepository.findById(userId).ifPresent(user -> {
+    	        PrincipalDetails principalDetails = new PrincipalDetails(user);
 
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(
-                                    principalDetails,
-                                    null,
-                                    principalDetails.getAuthorities()
-                            );
+    	        UsernamePasswordAuthenticationToken authentication =
+    	                new UsernamePasswordAuthenticationToken(
+    	                        principalDetails,
+    	                        null,
+    	                        principalDetails.getAuthorities()
+    	                );
 
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                });
-            }
-        }
+    	        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+    	        SecurityContextHolder.getContext().setAuthentication(authentication);
+    	    });
+    	}
 
         filterChain.doFilter(request, response);
     }

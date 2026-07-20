@@ -227,4 +227,9 @@ public class User {
     public void updateContactPhone(String contactPhone) {
         this.contactPhone = contactPhone;
     }
+    
+    // 관리자 계정 업데이트
+    public void updateRole(String role) {
+        this.role = role;
+    }
 }

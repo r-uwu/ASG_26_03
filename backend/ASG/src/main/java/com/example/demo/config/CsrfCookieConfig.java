@@ -10,6 +10,30 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 @Configuration
 public class CsrfCookieConfig {
+	
+    /**
+     * [Chain 3] /admin 페이지 — ROLE_ADMIN 전용
+     * CSRF disable (admin.html의 fetch()는 XSRF 토큰 없이 호출)
+     * 미인증/비권한 → /login 리다이렉트
+     */
+    @Bean
+    @Order(0)   // Chain 1(Order=1)보다 먼저 평가
+    public SecurityFilterChain adminPageFilterChain(HttpSecurity http) throws Exception {
+        http
+            .securityMatcher("/admin", "/admin/**")
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                .anyRequest().hasRole("ADMIN")   // ROLE_ADMIN
+            )
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint((request, response, authException) ->
+                    response.sendRedirect("/login"))
+                .accessDeniedHandler((request, response, accessDeniedException) ->
+                    response.sendRedirect("/login"))
+            );
+
+        return http.build();
+    }
 
     /**
      * [Chain 1] 고객센터 API — CSRF disable
@@ -54,28 +78,5 @@ public class CsrfCookieConfig {
     
  // CsrfCookieConfig.java 에 아래 Bean 추가 (기존 코드 하단에 붙이세요)
 
-    /**
-     * [Chain 3] /admin 페이지 — ROLE_ADMIN 전용
-     * CSRF disable (admin.html의 fetch()는 XSRF 토큰 없이 호출)
-     * 미인증/비권한 → /login 리다이렉트
-     */
-    @Bean
-    @Order(0)   // Chain 1(Order=1)보다 먼저 평가
-    public SecurityFilterChain adminPageFilterChain(HttpSecurity http) throws Exception {
-        http
-            .securityMatcher("/admin", "/admin/**")
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .anyRequest().hasRole("ADMIN")   // ROLE_ADMIN
-            )
-            .exceptionHandling(ex -> ex
-                .authenticationEntryPoint((request, response, authException) ->
-                    response.sendRedirect("/login"))
-                .accessDeniedHandler((request, response, accessDeniedException) ->
-                    response.sendRedirect("/login"))
-            );
-
-        return http.build();
-    }
     
 }

@@ -9,24 +9,18 @@
 
   STEP 1.  0_gather-setting.sql 실행
   STEP 2.  1_gather-setting.sql 실행
-  STEP 3.  관리자로 쓸 구글 계정 으로 로그인 → 회원가입 절차 완료
-  STEP 4.  구글 계정 A 로 로그인 → 회원가입 절차 완료
-  STEP 5.  구글 계정 B 로 로그인 → 회원가입 절차 완료
-  STEP 6.  아래 확인 쿼리로 각 계정의 id 확인
+  STEP 3.  구글 계정 A 로 로그인 → 회원가입 절차 완료
+  STEP 4.  구글 계정 B 로 로그인 → 회원가입 절차 완료
+  STEP 5.  아래 확인 쿼리로 각 계정의 id 확인
 
            SELECT id, email, provider, provider_id
            FROM users
            ORDER BY id ASC;
 
-           결과 예시:
-           id=1 / accountA@gmail.com / google / 117xxx...  ← 카페 디아즈로 쓸 계정
-           id=2 / accountB@gmail.com / google / 103xxx...  ← 카페 산정으로 쓸 계정
-
   STEP 6.  아래 SET 세 줄을 실제 id 값으로 수정 후 이 파일 전체 실행
 			
-		SET @ADMIN_USER_ID    = 1;  ← 관리자 계정 users.id
-		SET @DIAZ_USER_ID     = 2;  ← 카페 디아즈로 쓸 users.id
-		SET @SANJEONG_USER_ID = 3;  ← 카페 산정으로 쓸 users.id
+		SET @DIAZ_USER_ID     = ??;  ← 카페 디아즈로 쓸 users.id
+		SET @SANJEONG_USER_ID = ??;  ← 카페 산정으로 쓸 users.id
 
   ══════════════════════════════════════════════════════════════════
   이 파일이 하는 것
@@ -45,8 +39,8 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 -- ──────────────────────────────────────────────────────────────────
 -- 실행 전 아래 두 값 (1; 2;)을 실제 users.id 로 교체
+-- user.id 1번이 admin 계정으로 설정된 korjje617@gmail.com 이라는 가정 하에
 -- ──────────────────────────────────────────────────────────────────
-SET @ADMIN_USER_ID    = 1; -- admin 계정
 SET @DIAZ_USER_ID     = 2; -- 카페 디아즈 계정
 SET @SANJEONG_USER_ID = 3; -- 카페 산정 계정
 
@@ -65,8 +59,6 @@ WHERE brand_id IN (SELECT brand_id FROM brand WHERE user_id = @SANJEONG_USER_ID)
 
 DELETE FROM brand WHERE user_id = @SANJEONG_USER_ID;
 
-DELETE FROM business_hours   WHERE user_id = @ADMIN_USER_ID;
-DELETE FROM content_settings WHERE user_id = @ADMIN_USER_ID;
 DELETE FROM business_hours  WHERE user_id = @DIAZ_USER_ID;
 DELETE FROM business_hours  WHERE user_id = @SANJEONG_USER_ID;
 DELETE FROM content_settings WHERE user_id = @DIAZ_USER_ID;
@@ -77,34 +69,14 @@ DELETE FROM content_settings WHERE user_id = @SANJEONG_USER_ID;
 -- 2. brand(id=1,2) 에 실제 users.id 연결
 -- ══════════════════════════════════════════════
 
-UPDATE brand SET user_id = @DIAZ_USER_ID     WHERE brand_id = 1;
-UPDATE brand SET user_id = @SANJEONG_USER_ID WHERE brand_id = 2;
+UPDATE brand SET user_id = @DIAZ_USER_ID     WHERE brand_id = 1; -- 카페 디아즈가 브랜드 1번
+UPDATE brand SET user_id = @SANJEONG_USER_ID WHERE brand_id = 2; -- 카페 산정이 브랜드 2번
 
 
 -- ══════════════════════════════════════════════
 -- 3. users 정보 덮어쓰기
 --    (회원가입 시 입력한 이름, 가게명 등을 더미값으로 교체)
 -- ══════════════════════════════════════════════
-
-UPDATE users SET
-  NAME               = '관리자',
-  nickname           = '관리자',
-  contact_phone      = '01000000000',
-  company_name       = '소셜다모아',
-  business_category  = NULL,
-  preferred_channel  = NULL,
-  store_phone_number = NULL,
-  road_addr_part1    = NULL,
-  addr_detail        = NULL,
-  terms_agreed       = 1,
-  privacy_agreed     = 1,
-  location_agreed    = 1,
-  marketing_consent  = 0,
-  event_consent      = 0,
-  signup_completed   = 1,
-  STATUS             = 'ACTIVE',
-  role               = 'ROLE_ADMIN'        -- ← 핵심
-WHERE id = @ADMIN_USER_ID;
 
 UPDATE users SET
   NAME               = '카페디아즈',

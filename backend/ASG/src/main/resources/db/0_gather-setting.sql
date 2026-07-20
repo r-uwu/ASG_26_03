@@ -20,7 +20,6 @@
   notice         : 공지사항 (독립 테이블, FK 없음)
   faq            : 자주묻는질문 (독립 테이블, FK 없음)
   reply          : inquiry_id 논리적 참조 (물리 FK 없음 — cascade 충돌 방지)
-  admin_user     : 고객센터 관리자 계정 (독립 테이블, FK 없음)
 */
 
 DROP DATABASE IF EXISTS gather;
@@ -443,14 +442,6 @@ CREATE TABLE `reply` (
   KEY `idx_reply_inquiry_id` (`inquiry_id`)
 ) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='문의 답변';
 
-CREATE TABLE `admin_user` (
-  `id`       BIGINT       NOT NULL AUTO_INCREMENT,
-  `login_id` VARCHAR(100) NOT NULL UNIQUE COMMENT '관리자 로그인 ID',
-  `password` VARCHAR(255) NOT NULL,
-  `name`     VARCHAR(50)  NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=INNODB DEFAULT CHARSET=utf8mb4 COMMENT='고객센터 관리자 계정';
-
 -- sns_guides (콘텐츠 생성 가이드 — 플랫폼별 업로드 시간 및 멘트)
 CREATE TABLE `sns_guides` (
   `id`            BIGINT       NOT NULL AUTO_INCREMENT,
@@ -540,12 +531,8 @@ VALUES
 
 -- ══════════════════════════════════════════════
 -- customerCenter 시드 데이터
--- 순서: admin_user → faq → notice
+-- 순서: faq → notice
 -- ══════════════════════════════════════════════
-
--- 관리자 계정 (비밀번호: admin1234)
-INSERT INTO admin_user (login_id, PASSWORD, NAME) VALUES
-('admin', 'admin1234', '관리자');
 
 -- FAQ
 INSERT INTO faq (category, question, answer) VALUES

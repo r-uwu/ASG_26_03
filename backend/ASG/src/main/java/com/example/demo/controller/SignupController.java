@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,6 +26,9 @@ import lombok.extern.slf4j.Slf4j;
 public class SignupController {
 
     private final UserService userService;
+    
+    @Value("${app.admin.email}")
+    private String adminEmail;
 
     /**
      * signup/login 템플릿에서 공통으로 사용할 기본 모델값
@@ -36,26 +40,27 @@ public class SignupController {
         model.addAttribute("socialLoginRequired", true);
     }
 
+ // 변경 후
     @GetMapping("/login")
     public String loginPage(@AuthenticationPrincipal PrincipalDetails principal,
-                            HttpServletRequest request,
                             Model model) {
 
-        HttpSession session = request.getSession(false);
-
-        if (principal == null || session == null) {
+        if (principal == null) {
             return "login";
         }
 
         Long userId = principal.getUser().getId();
         User user = userService.findById(userId);
 
+        if (adminEmail.equals(user.getEmail())) {
+            return "redirect:/admin";
+        }
+
         if (user.getStatus() == UserStatus.ACTIVE) {
             return "redirect:/mypage";
         }
 
-        model.addAttribute("socialLoginRequired", false);
-        return "redirect:/signup";
+        return "login";
     }
 
     @GetMapping("/signup")
@@ -149,6 +154,10 @@ public class SignupController {
                     updatedUser.getNickname(),
                     updatedUser.getCompanyName());
 
+            if (adminEmail.equals(updatedUser.getEmail())) {
+                log.info("[POST] /signup/complete - 관리자 계정, /admin 으로 리다이렉트, userId={}", userId);
+                return "redirect:/admin";
+            }
             log.info("[POST] /signup/complete - 회원가입 완료, /mypage 로 리다이렉트, userId={}", userId);
             return "redirect:/mypage";
 

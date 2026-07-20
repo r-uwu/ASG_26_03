@@ -51,15 +51,21 @@ public class MypageService {
 	// ── 가게 정보 조회 ──────────────────────────────────────
 	@Transactional(readOnly = true)
 	public BrandInfoResponse getBrandInfo(Long userId) {
-		Brand brand = brandRepository.findByUser_Id(userId)
-				.orElseThrow(() -> new IllegalArgumentException("브랜드를 찾을 수 없습니다."));
+	    // 1. orElse(null)을 사용하여 예외 발생을 막음
+	    Brand brand = brandRepository.findByUser_Id(userId).orElse(null);
 
-		BrandOperationProfile profile = operationProfileRepository.findByBrand_BrandId(brand.getBrandId()).orElse(null);
+	    // 2. 브랜드가 없으면 에러가 아니라 null을 담은 응답 객체 혹은 null 자체를 반환
+	    if (brand == null) {
+	        return null; 
+	        // 또는 return new BrandInfoResponse(null, null); (프론트와 협의 필요)
+	    }
 
-		if (brand.getAddress() != null) {
-			brand.setAddress(stripZipCode(brand.getAddress()));
-		}
-		return new BrandInfoResponse(brand, profile);
+	    BrandOperationProfile profile = operationProfileRepository.findByBrand_BrandId(brand.getBrandId()).orElse(null);
+
+	    if (brand.getAddress() != null) {
+	        brand.setAddress(stripZipCode(brand.getAddress()));
+	    }
+	    return new BrandInfoResponse(brand, profile);
 	}
 	
 	// ── 회원 기본정보 수정 ──────────────────────────────────

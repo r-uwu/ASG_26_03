@@ -101,6 +101,7 @@ public class InquiryController {
             item.put("body",   inquiry.getBody() != null ? inquiry.getBody() : inquiry.getContent());
             item.put("status", inquiry.getStatus());
             item.put("attachmentNames", parseAttachmentNames(inquiry.getAttachmentNames()));
+            item.put("replies", replyRepository.findByInquiryIdOrderByIdAsc(inquiry.getId()));
             result.add(item);
         }
         return result;

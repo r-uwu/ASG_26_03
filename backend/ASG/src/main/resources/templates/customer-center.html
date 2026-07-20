@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>소셜다모아 — 고객센터</title>
+    <title>ASG - 고객센터</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -15,6 +15,29 @@
             --text:#0F172A; --text2:#475569; --text3:#64748B;
             --radius:18px; --radius-sm:12px;
         }
+       
+        
+        @font-face {
+    font-family: 'Presentation';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2404@1.0/Freesentation-4Regular.woff2') format('woff2');
+    font-weight: 500;
+    font-display: swap;
+	  }
+	  @font-face {
+	    font-family: 'Presentation';
+	    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2404@1.0/Freesentation-4Regular.woff2') format('woff2');
+	    font-weight: 400;
+	    font-display: swap;
+	}
+	  @font-face {
+	    font-family: 'Presentation';
+	    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2404@1.0/Freesentation-9Black.woff2') format('woff2');
+	    font-weight: 900;
+	    font-display: swap;
+	  }
+
+        
+      
 
         * { margin:0; padding:0; box-sizing:border-box; }
 
@@ -205,7 +228,7 @@
         }
 
         .cs-hero h1 {
-            font-family:'DM Serif Display',serif;
+            font-family: 'Presentation', sans-serif;
             font-size:clamp(30px,4vw,44px);
             font-weight:400;
             line-height:1.1;
@@ -1052,25 +1075,25 @@
     </style>
 </head>
 <body>
+
 <div class="blob blob-1"></div>
 <div class="blob blob-2"></div>
 <div class="blob blob-3"></div>
 
 <div class="wrapper">
     <header>
-        <div class="logo">
-            <div class="logo-mark">S</div>
-            <div class="logo-text">소셜다모아<span>All Social Gather</span></div>
-        </div>
+        <a th:href="@{/}" href="/" class="logo">
+	  <img th:src="@{/image/logo_asg.png}" src="/image/logo_asg.png" style="width:30px; height:auto;" alt="로고 이미지" />
+	  <img th:src="@{/image/asg.png}" src="/image/asg.png" style="width:160px; height:auto;" alt="로고 이미지" />
+	</a>
         <div class="header-badge">고객센터</div>
     </header>
 
     <section class="cs-hero">
         <div class="hero-dot-group">
-            <span></span><span></span><span></span><span></span>
         </div>
         <div class="hero-accent"></div>
-        <h1>무엇을 <em>도와드릴까요?</em></h1>
+        <h1>무엇을 도와드릴까요?</h1>
         <p>자주 묻는 질문과 공지사항을 한곳에서 빠르게 확인하고, 필요하면 바로 문의를 남겨보세요.</p>
     </section>
 
@@ -1083,7 +1106,6 @@
     <section class="panel">
         <div class="panel-header">
             <div class="panel-header-left">
-                <div class="panel-icon" id="panelIcon">❓</div>
                 <h2 id="panelTitle">자주 묻는 질문</h2>
             </div>
         </div>
@@ -1350,17 +1372,14 @@
         if (view === 'faq') {
             faqSection.classList.remove('hidden');
             panelTitle.textContent = '자주 묻는 질문';
-            panelIcon.textContent = '❓';
             renderFaqs();
         } else if (view === 'notice') {
             noticeSection.classList.remove('hidden');
             panelTitle.textContent = '공지사항';
-            panelIcon.textContent = '📢';
             renderNotices();
         } else {
             inquirySection.classList.remove('hidden');
             panelTitle.textContent = '문의하기';
-            panelIcon.textContent = '✉️';
         }
     }
 
@@ -1608,12 +1627,10 @@
     });
 
  // URL 파라미터 확인 후 탭 결정
-// 변경 후
-(async () => {
+ 	(async () => {
 	bindFaqTypeTabs();  // ← 추가
 	
     await Promise.all([loadFaqs(), loadNotices()]);
-
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
     if (tabParam === 'inquiry') {
@@ -1621,7 +1638,7 @@
     } else {
         switchView('faq');
     }
-})();
+ 	})();
     
 </script>
 </body>

@@ -16,7 +16,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -31,6 +30,9 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     @Value("${app.jwt.cookie-secure:false}")
     private boolean cookieSecure;
+
+    @Value("${app.admin.email}")
+    private String adminEmail;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
@@ -63,46 +65,30 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         refreshCookie.setMaxAge((int) (refreshExpirationMs / 1000));
         response.addCookie(refreshCookie);
 
-        // accessToken도 쿠키로 쓸 경우
         Cookie accessCookie = new Cookie("access_token", accessToken);
         accessCookie.setHttpOnly(true);
         accessCookie.setSecure(cookieSecure);
         accessCookie.setPath("/");
-        accessCookie.setMaxAge(60 * 30); // 예: 30분
+        accessCookie.setMaxAge(60 * 30);
         response.addCookie(accessCookie);
 
-        if (user.getStatus() != UserStatus.ACTIVE) {
-            response.sendRedirect("/signup?social_login=success");
-            return;
-        }
-        
-        // ↓ 여기에 추가 (ACTIVE 계정만 발급)
-        if ("ROLE_ADMIN".equals(user.getRole())) {
+        // admin 체크 먼저 (status 관계없이)
+        if (adminEmail.equals(user.getEmail())) {
             Cookie adminAccessCookie = new Cookie("admin_access_token", accessToken);
             adminAccessCookie.setHttpOnly(false);
             adminAccessCookie.setSecure(cookieSecure);
             adminAccessCookie.setPath("/admin");
             adminAccessCookie.setMaxAge(60 * 30);
             response.addCookie(adminAccessCookie);
-        }
-
-     // 변경 후
-        if ("ROLE_ADMIN".equals(user.getRole())) {
             response.sendRedirect("/admin");
             return;
         }
 
-        String redirectUrl = "/mypage";
-
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            String entryPoint = (String) session.getAttribute("entryPoint");
-            if (entryPoint != null && !entryPoint.isBlank()) {
-                redirectUrl = entryPoint;
-            }
-            session.removeAttribute("entryPoint");
+        if (user.getStatus() != UserStatus.ACTIVE) {
+            response.sendRedirect("/signup?social_login=success");
+            return;
         }
 
-        response.sendRedirect(redirectUrl);
+        response.sendRedirect("/mypage");
     }
 }
