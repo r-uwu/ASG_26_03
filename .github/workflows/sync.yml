@@ -17,5 +17,5 @@ jobs:
         run: |
           git remote add upstream https://github.com/leeseonju12/Team_Project
           git fetch upstream
-          git merge upstream/main
-          git push origin main
+          git merge upstream/develop
+          git push origin develop
